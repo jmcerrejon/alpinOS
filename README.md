@@ -1,4 +1,4 @@
-# alpinOS
+# ALPINOS
 
 ![alpinOS](logo.png)
 
