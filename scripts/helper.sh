@@ -20,11 +20,45 @@ function check_board() {
 }
 
 #
-# Enable edge repo. Note: enable the repository for community if you want vim,
+# Enable edge repo and community. Note: enable the repository for community if you want vim,
 # mc, php, apache, nginx, etc.
 #
-function enable_edge() {
-	sed -i '/edge/s/^#//' etc/apk/repositories
+function enable_repos() {
+	sed -i '/community/s/^#//' /etc/apk/repositories
+	sed -i '/edge/s/^#//' /etc/apk/repositories
+	apk update
+	commit_changes
+}
+
+#
+# Expand with the full disk size
+#
+function expand_disk() {
+	blkid # get info about partitions
+	apk add cfdisk
+	umount -a
+	cfdisk /dev/mmcblk0
+}
+
+#
+# My common packages when start from scratch
+#
+function install_common_pkgs() {
+	# https://misapuntesde.com/post.php?id=916 <- netatalk
+	# https://misapuntesde.com/post.php?id=438 <- sshfs
+	apk add nano mc netatalk sshfs
+	commit_changes
+}
+
+#
+# Set bash as default shell
+#
+function set_bash() {
+	apk add bash bash-completion
+	commit_changes
+	sed -i 's/ash/bash/g' /etc/passwd
+	cp ../res/.bashrc ~/.bashrc
+	cp ../res/.bash_aliases ~/.bash_aliases
 }
 
 #
@@ -49,10 +83,11 @@ function add_wifi() {
 	ip link set wlan0 up
 	# TODO Make a cool menu for ask the next steps
 	iwlist wlan0 scanning | grep 'ESSID'
-	iwconfig wlan0 essid TDC_032E # TDC_032E is an example
+	read -p "Type your SSID: " ssid
+	iwconfig wlan0 essid "${ssid}"
 	iwconfig wlan0
 	read -p "Type the password: " input
-	wpa_passphrase 'TDC_032E' "${input}" > /etc/wpa_supplicant/wpa_supplicant.conf
+	wpa_passphrase "${ssid}" "${input}" > /etc/wpa_supplicant/wpa_supplicant.conf
 	wpa_supplicant -B -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf
 	udhcpc -i wlan0
 	ip addr show wlan0
@@ -65,10 +100,21 @@ function add_wifi() {
 
 #
 # Add the Pi user
+# NOTE: Remove it with: deluser pi
 #
 function add_pi_user() {
 	adduser -g 'John Wick' pi
-	# Remove user with deluser pi
+	chown -R pi /home/pi
+	lbu add /home/pi
+	while true; do
+      read -p "Do you want to boot with user pi automatically? [y/n] " yn
+      case $yn in
+        [Yy]* ) sed -i 's/tty1::respawn:\/sbin\/getty 38400 tty1/tty1::respawn:\/bin\/login -f pi/g' /etc/inittab; break ;;
+        [Nn]* ) exit 1 ;;
+        * ) echo "Please answer (y)es or (n)o.";;
+      esac
+    done
+	commit_changes
 }
 
 #
