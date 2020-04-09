@@ -8,7 +8,7 @@
 #		  http://www.linuxfromscratch.org/blfs/view/svn/x/fluxbox.html
 #
 clear
-. ./helper.sh
+. ./helper.sh || wget -q 'https://raw.githubusercontent.com/jmcerrejon/alpinOS/master/scripts/helper.sh'
 check_board || { echo "Missing file helper.sh. I've tried to download it for you. Try to run the script again." && exit 1; }
 
 function install() {
