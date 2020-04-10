@@ -3,6 +3,7 @@ alias edit_rc='nano ~/.bashrc && source ~/.bashrc'
 alias edit_al='nano ~/.bash_aliases && source ~/.bash_aliases'
 # apk
 alias aa='apk add $1'
+alias as="apk search -v '{$1}*'"
 # common
 # Very useful ncdu command
 alias du='sudo du -shc $1*'
@@ -11,4 +12,4 @@ alias ll='ls -la'
 alias rmr='rm -rf $1'
 alias ..='cd ..'
 alias ...='cd ../..'
-alias version='hostnamectl'
+alias info='uname -a && '
