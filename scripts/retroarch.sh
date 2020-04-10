@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env ash
 #
 # Description : RetroArch
 # Author      : Jose Cerrejon Gonzalez (ulysess@gmail_dot._com)

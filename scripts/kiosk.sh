@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env ash
 #
 # Description : Kiosk mode
 # Author      : Jose Cerrejon Gonzalez (ulysess@gmail_dot._com)

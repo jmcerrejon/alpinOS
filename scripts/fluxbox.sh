@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env ash
 #
 # Description : Fluxbox
 # Author      : Jose Cerrejon Gonzalez (ulysess@gmail_dot._com)

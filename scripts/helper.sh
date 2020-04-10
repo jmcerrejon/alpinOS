@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env ash
 # Great resource: https://wiki.alpinelinux.org/wiki/Raspberry_Pi
 # OTHERS		: https://postmarketos.org/
 
