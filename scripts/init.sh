@@ -7,6 +7,7 @@
 #
 clear
 wget -q 'https://raw.githubusercontent.com/jmcerrejon/alpinOS/master/scripts/helper.sh'
+chmod +x helper.sh
 . ./helper.sh
 
 # Enable edge & community repositories
@@ -15,8 +16,6 @@ enable_repos
 # My common packages when start from scratch
 install_common_pkgs
 
-add_pi_user
-
 git clone https://github.com/jmcerrejon/alpinOS.git
 
-echo -e '\nSystem is ready!...Have a nice day.\n'
+add_pi_user
