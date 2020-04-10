@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Great resource: https://wiki.alpinelinux.org/wiki/Raspberry_Pi
+# OTHERS		: https://postmarketos.org/
 
 #
 # Check what is your SBC
@@ -27,17 +28,15 @@ function enable_repos() {
 	sed -i '/community/s/^#//' /etc/apk/repositories
 	sed -i '/edge/s/^#//' /etc/apk/repositories
 	apk update
+	while true; do
+      read -p "Do you want to upgrade the OS? [y/n] " yn
+      case $yn in
+        [Yy]* ) apk upgrade; break ;;
+        [Nn]* ) exit 1 ;;
+        * ) echo "Please answer (y)es or (n)o.";;
+      esac
+    done
 	commit_changes
-}
-
-#
-# Expand with the full disk size
-#
-function expand_disk() {
-	blkid # get info about partitions
-	apk add cfdisk
-	umount -a
-	cfdisk /dev/mmcblk0
 }
 
 #
@@ -46,8 +45,15 @@ function expand_disk() {
 function install_common_pkgs() {
 	# https://misapuntesde.com/post.php?id=916 <- netatalk
 	# https://misapuntesde.com/post.php?id=438 <- sshfs
-	apk add nano mc netatalk sshfs
+	apk add -U git nano mc rng-tools raspberrypi htop xrandr sshfs netatalk
 	commit_changes
+}
+
+#
+# kill all processes from user
+#
+function kill_user() {
+	ps -e -o user,pid | grep '"{$1}"' | awk '{ print $2 }' | xargs kill
 }
 
 #
@@ -55,10 +61,29 @@ function install_common_pkgs() {
 #
 function set_bash() {
 	apk add bash bash-completion
-	commit_changes
 	sed -i 's/ash/bash/g' /etc/passwd
 	cp ../res/.bashrc ~/.bashrc
 	cp ../res/.bash_aliases ~/.bash_aliases
+	commit_changes
+}
+
+#
+# Add the Pi user
+# NOTE: Remove it with: deluser pi
+#
+function add_pi_user() {
+	adduser -g 'John Wick' pi
+	chown -R pi /home/pi
+	lbu add /home/pi
+	while true; do
+      read -p "Do you want to boot with user pi automatically? [y/n] " yn
+      case $yn in
+        [Yy]* ) sed -i 's/tty1::respawn:\/sbin\/getty 38400 tty1/tty1::respawn:\/bin\/login -f pi/g' /etc/inittab; break ;;
+        [Nn]* ) exit 1 ;;
+        * ) echo "Please answer (y)es or (n)o.";;
+      esac
+    done
+	commit_changes
 }
 
 #
@@ -99,25 +124,6 @@ function add_wifi() {
 }
 
 #
-# Add the Pi user
-# NOTE: Remove it with: deluser pi
-#
-function add_pi_user() {
-	adduser -g 'John Wick' pi
-	chown -R pi /home/pi
-	lbu add /home/pi
-	while true; do
-      read -p "Do you want to boot with user pi automatically? [y/n] " yn
-      case $yn in
-        [Yy]* ) sed -i 's/tty1::respawn:\/sbin\/getty 38400 tty1/tty1::respawn:\/bin\/login -f pi/g' /etc/inittab; break ;;
-        [Nn]* ) exit 1 ;;
-        * ) echo "Please answer (y)es or (n)o.";;
-      esac
-    done
-	commit_changes
-}
-
-#
 # Essentials X11 libs
 #
 function install_X11() {
@@ -129,7 +135,9 @@ function install_X11() {
 # Add sound to our World
 #
 function install_alsa() {
-	apk add alsa-base alsa-utils
+	apk add alsa-base alsa-utils alsa-lib alsaconf
+	rc-service alsa start
+	rc-update add alsa
 	# usermod -a -G audio ${USER}
 }
 
@@ -141,6 +149,23 @@ function sshfs() {
 	modprobe fuse
 	mkdir -p /home/pi/remote/
 	# Example of use: sshfs ulysess@192.168.0.104:/Users/ulysess/Documents/sc/alpinOS/scripts/ /home/pi/remote/
+}
+
+#
+# Expand with the full disk size
+# FIXME It doesn't work. HELP ME!
+#
+function expand_disk() {
+	blkid # get info about partitions
+	apk add cfdisk
+	umount -a
+	cfdisk /dev/mmcblk0
+}
+
+function vbox() {
+	apk add -U virtualbox-guest-additions virtualbox-guest-modules-virt
+	modprobe -a vboxsf
+	mount -t vboxsf vbox_shared /mnt/outside
 }
 
 function commit_changes() {
