@@ -22,5 +22,11 @@ Nothing special. Just a proof of concept. My goals are:
 
 * This OS is volatile. If you want to commit your changes, just type ``` lbu commit ```
 
+* For get ready with some essential tasks, just type the next:
+
+```bash
+wget https://raw.githubusercontent.com/jmcerrejon/alpinOS/master/scripts/init.sh -O - | ash
+```
+
 MIT License
 
