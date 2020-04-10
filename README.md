@@ -22,11 +22,15 @@ Nothing special. Just a proof of concept. My goals are:
 
 * This OS is volatile. If you want to commit your changes, just type ``` lbu commit ```
 
+* You should not use only root user, but If you do, type the next: ``` lbu add /root ```
+
 * For get ready with some essential tasks, just type the next:
 
 ```bash
 wget https://raw.githubusercontent.com/jmcerrejon/alpinOS/master/scripts/init.sh -O - | ash
 ```
+
+* You have some interesting scripts inside /scripts dir. Improve then and make a PR!. 💪🏻
 
 MIT License
 
