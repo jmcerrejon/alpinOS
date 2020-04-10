@@ -16,6 +16,15 @@ enable_repos
 # My common packages when start from scratch
 install_common_pkgs
 
-git clone https://github.com/jmcerrejon/alpinOS.git
+# Clone my awesome repo
+git clone https://github.com/jmcerrejon/alpinOS.git && cd alpinOS
 
+# Copy some files for customize session
+cp ./res/.profile ~/.profile && cp ./res/.bash_aliases ~/.bash_aliases
+
+# Commit changes on /root
+lbu add /root
+lbu commit -d
+
+# Add pi user
 add_pi_user
