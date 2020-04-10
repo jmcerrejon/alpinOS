@@ -28,14 +28,12 @@ function enable_repos() {
 	sed -i '/community/s/^#//' /etc/apk/repositories
 	sed -i '/edge/s/^#//' /etc/apk/repositories
 	apk update
-	while true; do
-      read -p "Do you want to upgrade the OS? [y/n] " yn
-      case $yn in
-        [Yy]* ) apk upgrade; break ;;
-        [Nn]* ) exit 1 ;;
-        * ) echo "Please answer (y)es or (n)o.";;
-      esac
-    done
+    read -p "Do you want to upgrade the OS? [y/n] " yn
+	case $yn in
+        [Yy]* ) apk upgrade;;
+        [Nn]* ) ;;
+        * ) "Invalid input. Exiting...";;
+	esac
 	commit_changes
 }
 
@@ -75,14 +73,12 @@ function add_pi_user() {
 	adduser -g 'John Wick' pi
 	chown -R pi /home/pi
 	lbu add /home/pi
-	while true; do
-      read -p "Do you want to boot with user pi automatically? [y/n] " yn
-      case $yn in
-        [Yy]* ) sed -i 's/tty1::respawn:\/sbin\/getty 38400 tty1/tty1::respawn:\/bin\/login -f pi/g' /etc/inittab; break ;;
-        [Nn]* ) exit 1 ;;
-        * ) echo "Please answer (y)es or (n)o.";;
-      esac
-    done
+	read -p "Do you want to boot with user pi automatically? [y/n] " yn
+	case $yn in
+		[Yy]* ) sed -i 's/tty1::respawn:\/sbin\/getty 38400 tty1/tty1::respawn:\/bin\/login -f pi/g' /etc/inittab;;
+		[Nn]* ) ;;
+		* ) echo "Invalid input. Exiting...";;
+	esac
 	commit_changes
 }
 
