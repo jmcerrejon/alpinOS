@@ -6,7 +6,7 @@
 # Compatible  : Raspberry Pi 4 (tested)
 #
 clear
-. ./helper.sh || wget -q 'https://raw.githubusercontent.com/jmcerrejon/alpinOS/master/scripts/helper.sh'
+[ ! -f ./helper.sh ] && wget -q 'https://raw.githubusercontent.com/jmcerrejon/alpinOS/master/scripts/helper.sh'
 chmod +x helper.sh
 . ./helper.sh
 [ -d "./res" ] && resource=./res || resource=../res
