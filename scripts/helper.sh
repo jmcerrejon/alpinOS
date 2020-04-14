@@ -28,11 +28,11 @@ function enable_repos() {
 	sed -i '/community/s/^#//' /etc/apk/repositories
 	sed -i '/edge/s/^#//' /etc/apk/repositories
 	apk update
-    read -p "Do you want to upgrade the OS? [y/n] " yn
+	read -p "Do you want to upgrade the OS? [y/n] " yn
 	case $yn in
-        [Yy]* ) apk upgrade;;
-        [Nn]* ) ;;
-        * ) "Invalid input. Exiting...";;
+	[Yy]*) apk upgrade ;;
+	[Nn]*) ;;
+	*) "Invalid input. Exiting..." ;;
 	esac
 	commit_changes
 }
@@ -43,7 +43,7 @@ function enable_repos() {
 function install_common_pkgs() {
 	# https://misapuntesde.com/post.php?id=916 <- netatalk
 	# https://misapuntesde.com/post.php?id=438 <- sshfs
-	apk add -U git nano mc rng-tools raspberrypi htop xrandr sshfs netatalk
+	apk add -U git nano mc rng-tools raspberrypi htop xrandr shadow sshfs netatalk
 	commit_changes
 }
 
@@ -70,14 +70,17 @@ function set_bash() {
 # NOTE: Remove it with: deluser pi
 #
 function add_pi_user() {
-	adduser -g 'John Wick' pi
-	chown -R pi /home/pi
+	# adduser -g 'John Wick' pi
+	# chown -R pi /home/pi
+	useradd -mb /home -s /bin/ash -G input,video pi
+	echo 'pi ALL=(ALL) NOPASSWD:ALL' >/etc/sudoers.d/pi
+	passwd pi
 	lbu add /home/pi
 	read -p "Do you want to boot with user pi automatically? [y/n] " yn
 	case $yn in
-		[Yy]* ) sed -i 's/tty1::respawn:\/sbin\/getty 38400 tty1/tty1::respawn:\/bin\/login -f pi/g' /etc/inittab;;
-		[Nn]* ) ;;
-		* ) echo "Invalid input. Exiting...";;
+	[Yy]*) sed -i 's/tty1::respawn:\/sbin\/getty 38400 tty1/tty1::respawn:\/bin\/login -f pi/g' /etc/inittab ;;
+	[Nn]*) ;;
+	*) echo "Invalid input. Exiting..." ;;
 	esac
 	commit_changes
 }
@@ -108,7 +111,7 @@ function add_wifi() {
 	iwconfig wlan0 essid "${ssid}"
 	iwconfig wlan0
 	read -p "Type the password: " input
-	wpa_passphrase "${ssid}" "${input}" > /etc/wpa_supplicant/wpa_supplicant.conf
+	wpa_passphrase "${ssid}" "${input}" >/etc/wpa_supplicant/wpa_supplicant.conf
 	wpa_supplicant -B -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf
 	udhcpc -i wlan0
 	ip addr show wlan0
@@ -124,17 +127,29 @@ function add_wifi() {
 #
 function install_X11() {
 	setup-xorg-base
-	apk add xmodmap mesa-dri-vc4 mesa-egl xf86-video-fbdev xf86-video-vesa xf86-input-mouse xf86-input-keyboard dbus setxkbmap kbd xrandr xset xinit xterm
+	apk add xmodmap mesa-dri-vc4 mesa-egl xf86-video-fbdev xf86-video-modesetting xf86-video-vesa xf86-input-mouse xf86-input-keyboard dbus setxkbmap kbd xrandr xset xinit xterm lightdm-gtk-greeter
+	rc-update add dbus
+	rc-service dbus start
+	rc-service lightdm start
+	# rc-update del lightdm
+	# X -configure
+	# [ -f ~/xorg.conf.new ] && mv ~/xorg.conf.new /etc/X11/xorg.conf
+	cvt 1280 720 60 > ~/modeline
+	xrandr --output HDMI-1 --mode 1280x720 --rate 60
 }
 
 #
 # Add sound to our World
+# set up with the command: alsamixer
 #
 function install_alsa() {
-	apk add alsa-base alsa-utils alsa-lib alsaconf
+	apk add alsa-utils alsa-lib alsaconf shadow
 	rc-service alsa start
 	rc-update add alsa
-	# usermod -a -G audio ${USER}
+	usermod -a -G audio ${USER}
+	lbu add /var
+	alsactl --file /var/lib/alsa/asound.state store
+	commit_changes
 }
 
 #
