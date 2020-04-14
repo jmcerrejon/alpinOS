@@ -27,10 +27,14 @@ Nothing special. Just a proof of concept. My goals are:
 * For get ready with some essential tasks, just type the next:
 
 ```bash
-wget https://raw.githubusercontent.com/jmcerrejon/alpinOS/master/scripts/init.sh -O - | ash
+wget -qO- https://git.io/Jfe2R | ash
 ```
 
 * You have some interesting scripts inside /scripts dir. Improve then and make a PR!. 💪🏻
+
+## TODO
+
+* Set the display to run app that requires *DISPLAY*. 🤷‍♂️
 
 MIT License
 
