@@ -4,6 +4,8 @@
 
 ### A Raspberry Pi 4 distro based on Alpine Linux
 
+![alpinOS](./screenshots/alpinOS_htop_v0.1.png)
+
 Nothing special. Just a proof of concept. My goals are:
 
 * Lightweight distribution based on *Alpine Linux*.
