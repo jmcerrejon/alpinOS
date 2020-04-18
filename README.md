@@ -26,7 +26,7 @@ Nothing special. Just a proof of concept. My goals are:
 
 * You should not use only root user, but If you do, type the next: ``` lbu add /root ```
 
-* For get ready with some essential tasks, just type the next:
+* **ALPHA STAGE with issues**: For get ready with some essential tasks, just type the next:
 
 ```bash
 wget -qO- https://git.io/Jfe2R | ash
