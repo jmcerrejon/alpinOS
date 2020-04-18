@@ -43,7 +43,7 @@ function enable_repos() {
 function install_common_pkgs() {
 	# https://misapuntesde.com/post.php?id=916 <- netatalk
 	# https://misapuntesde.com/post.php?id=438 <- sshfs
-	apk add -U git nano mc rng-tools raspberrypi htop xrandr shadow sshfs netatalk
+	apk add -U git nano mc rng-tools raspberrypi raspberrypi-bootloader-cutdown htop xrandr shadow sshfs netatalk
 	commit_changes
 }
 
@@ -52,6 +52,17 @@ function install_common_pkgs() {
 #
 function kill_user() {
 	ps -e -o user,pid | grep '"{$1}"' | awk '{ print $2 }' | xargs kill
+}
+
+#
+# Remove tty 3-6
+#
+function remove_ttys() {
+	sed -i '/tty3/s//^#tty3/' /etc/inittab
+	sed -i '/tty4/s//^#tty4/' /etc/inittab
+	sed -i '/tty5/s//^#tty5/' /etc/inittab
+	sed -i '/tty6/s//^#tty6/' /etc/inittab
+	commit_changes
 }
 
 #

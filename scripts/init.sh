@@ -17,6 +17,9 @@ enable_repos
 # My common packages when start from scratch
 install_common_pkgs
 
+# We don't need too many tty consoles
+remove_ttys
+
 # Clone my awesome repo
 if [ ! -d ~/alpinOS ]; then
 	git clone https://github.com/jmcerrejon/alpinOS.git && cd alpinOS
