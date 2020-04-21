@@ -1,4 +1,4 @@
-#!/usr/bin/env ash
+#!/usr/bin/env sh
 #
 # Description : Init - Just some code to run when you start from scratch
 # Author      : Jose Cerrejon Gonzalez (ulysess@gmail_dot._com)
