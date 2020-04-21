@@ -1,11 +1,11 @@
-#!/usr/bin/env ash
+#!/usr/bin/env sh
 # Great resource: https://wiki.alpinelinux.org/wiki/Raspberry_Pi
 # OTHERS		: https://postmarketos.org/
 
 #
 # Check what is your SBC
 #
-function check_board() {
+check_board() {
 	if [[ $(cat /proc/cpuinfo | grep 'ODROIDC') ]]; then
 		MODEL="ODROID-C1"
 	elif [[ $(cat /proc/cpuinfo | grep 'BCM2708\|BCM2709\|BCM2835') ]]; then
@@ -24,7 +24,7 @@ function check_board() {
 # Enable edge repo and community. Note: enable the repository for community if you want vim,
 # mc, php, apache, nginx, etc.
 #
-function enable_repos() {
+enable_repos() {
 	sed -i '/community/s/^#//' /etc/apk/repositories
 	sed -i '/edge/s/^#//' /etc/apk/repositories
 	apk update
@@ -40,7 +40,7 @@ function enable_repos() {
 #
 # My common packages when start from scratch
 #
-function install_common_pkgs() {
+install_common_pkgs() {
 	# https://misapuntesde.com/post.php?id=916 <- netatalk
 	# https://misapuntesde.com/post.php?id=438 <- sshfs
 	apk add -U git nano mc rng-tools raspberrypi raspberrypi-bootloader-cutdown htop xrandr shadow sshfs netatalk
@@ -50,25 +50,25 @@ function install_common_pkgs() {
 #
 # kill all processes from user
 #
-function kill_user() {
+kill_user() {
 	ps -e -o user,pid | grep '"{$1}"' | awk '{ print $2 }' | xargs kill
 }
 
 #
 # Remove tty 3-6
 #
-function remove_ttys() {
-	sed -i '/tty3/s//^#tty3/' /etc/inittab
-	sed -i '/tty4/s//^#tty4/' /etc/inittab
-	sed -i '/tty5/s//^#tty5/' /etc/inittab
-	sed -i '/tty6/s//^#tty6/' /etc/inittab
+remove_ttys() {
+	sed -i '/tty3/s//#tty3/' /etc/inittab
+	sed -i '/tty4/s//#tty4/' /etc/inittab
+	sed -i '/tty5/s//#tty5/' /etc/inittab
+	sed -i '/tty6/s//#tty6/' /etc/inittab
 	commit_changes
 }
 
 #
 # Set bash as default shell
 #
-function set_bash() {
+set_bash() {
 	apk add bash bash-completion
 	sed -i 's/ash/bash/g' /etc/passwd
 	cp ../res/.bashrc ~/.bashrc
@@ -80,11 +80,11 @@ function set_bash() {
 # Add the Pi user
 # NOTE: Remove it with: deluser pi
 #
-function add_pi_user() {
+add_pi_user() {
 	# adduser -g 'John Wick' pi
 	# chown -R pi /home/pi
 	useradd -mb /home -s /bin/ash -G input,video pi
-	echo 'pi ALL=(ALL) NOPASSWD:ALL' >/etc/sudoers.d/pi
+	# echo 'pi ALL=(ALL) NOPASSWD:ALL' >/etc/sudoers.d/pi
 	passwd pi
 	lbu add /home/pi
 	read -p "Do you want to boot with user pi automatically? [y/n] " yn
@@ -99,7 +99,7 @@ function add_pi_user() {
 #
 # Fix clock
 #
-function fix_clock() {
+fix_clock() {
 	rc-update del hwclock boot
 	rc-update add swclock boot
 	service hwclock stop
@@ -113,7 +113,7 @@ function fix_clock() {
 # Connect WiFi devices
 # Help: https://wiki.alpinelinux.org/wiki/Connecting_to_a_wireless_access_point
 #
-function add_wifi() {
+add_wifi() {
 	apk add wireless-tools wpa_supplicant
 	ip link set wlan0 up
 	# TODO Make a cool menu for ask the next steps
@@ -136,9 +136,10 @@ function add_wifi() {
 #
 # Essentials X11 libs
 #
-function install_X11() {
+install_X11() {
 	setup-xorg-base
-	apk add xmodmap mesa-dri-vc4 mesa-egl xf86-video-fbdev xf86-video-modesetting xf86-video-vesa xf86-input-mouse xf86-input-keyboard dbus setxkbmap kbd xrandr xset xinit xterm lightdm-gtk-greeter
+	apk add xmodmap mesa-dri-vc4 mesa-egl xf86-video-fbdev xf86-video-modesetting xf86-input-mouse xf86-input-keyboard dbus setxkbmap kbd xrandr xset xinit
+	# apk add xfbdev jwm lxterminal xkbcomp xkeyboard-config ttf-freefont
 	rc-update add dbus
 	rc-service dbus start
 	rc-service lightdm start
@@ -153,7 +154,7 @@ function install_X11() {
 # Add sound to our World
 # set up with the command: alsamixer
 #
-function install_alsa() {
+install_alsa() {
 	apk add alsa-utils alsa-lib alsaconf shadow
 	rc-service alsa start
 	rc-update add alsa
@@ -166,7 +167,7 @@ function install_alsa() {
 #
 # Dumb function, I know it
 #
-function sshfs() {
+sshfs() {
 	apk add sshfs
 	modprobe fuse
 	mkdir -p /home/pi/remote/
@@ -177,19 +178,19 @@ function sshfs() {
 # Expand with the full disk size
 # FIXME It doesn't work. HELP ME!
 #
-function expand_disk() {
+expand_disk() {
 	blkid # get info about partitions
 	apk add cfdisk
 	umount -a
 	cfdisk /dev/mmcblk0
 }
 
-function vbox() {
+vbox() {
 	apk add -U virtualbox-guest-additions virtualbox-guest-modules-virt
 	modprobe -a vboxsf
 	mount -t vboxsf vbox_shared /mnt/outside
 }
 
-function commit_changes() {
+commit_changes() {
 	lbu commit -d
 }
