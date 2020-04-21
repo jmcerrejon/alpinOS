@@ -20,6 +20,8 @@ Nothing special. Just a proof of concept. My goals are:
 
 * user: root, password: 1234
 
+* user: pi, password: 1234
+
 * Configure with ``` alpine-setup ```
 
 * This OS is volatile. If you want to commit your changes, just type ``` lbu commit ```
