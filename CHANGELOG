@@ -1,3 +1,9 @@
+V 0.3
+
+* Added Cordless (Discord's clone).
+
+* Added PostgreSQL.
+
 V 0.2
 
 * Installed on /root alpinOS repo.
