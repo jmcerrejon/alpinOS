@@ -1,3 +1,6 @@
+export DISPLAY=:0
+export PATH=/usr/lib/:$PATH
+
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
